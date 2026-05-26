@@ -7,7 +7,6 @@ import com.stbu.utils.RestResponse;
 import org.springframework.web.bind.annotation.*;
 import java.util.List;
 
-
 @RestController
 @RequestMapping("/user")
 public class UserController {
@@ -18,7 +17,7 @@ public class UserController {
         this.userService = userService;
     }
 
-
+    // 根据ID查询
     @GetMapping("/getById/{id}")
     public RestResponse<UserEntity> getUserById(@PathVariable int id){
         UserEntity user = userService.getById(id);
@@ -29,25 +28,27 @@ public class UserController {
         }
     }
 
-    @RequestMapping("/getByName")
-    public RestResponse getUserByNameAndPassword(@RequestParam("username")String username,
-                                                 @RequestParam("password")String password){
+    // 登录接口（前端用这个）
+    @GetMapping("/getByName")
+    public RestResponse getUserByNameAndPassword(
+            @RequestParam("username") String username,
+            @RequestParam("password") String password
+    ){
         if (username == null || password == null){
             return RestResponse.fail("用户名或密码为空");
+        }
+        QueryWrapper<UserEntity> queryWrapper = new QueryWrapper<>();
+        queryWrapper.eq("username",username);
+        queryWrapper.eq("password",password);
+        UserEntity user= userService.getOne(queryWrapper);
+        if (user==null){
+            return RestResponse.fail("用户名或密码错误");
         }else {
-            QueryWrapper<UserEntity> queryWrapper = new QueryWrapper<>();
-            queryWrapper.eq("username",username);
-            queryWrapper.eq("password",password);
-            UserEntity user= userService.getOne(queryWrapper);
-            if (user==null){
-                return RestResponse.fail("该用户不存在");
-            }else {
-                return RestResponse.ok(user);
-            }
+            return RestResponse.ok(user);
         }
     }
 
-    // 查询所有用户接口
+    // 查询所有用户
     @GetMapping("/getAll")
     public RestResponse<List<UserEntity>> getAllUsers() {
         List<UserEntity> userList = userService.list();
@@ -57,10 +58,9 @@ public class UserController {
         return RestResponse.ok(userList);
     }
 
-    // 新增用户接口
+    // 注册接口（前端用这个）
     @PostMapping("/add")
     public RestResponse<UserEntity> addUser(@RequestBody UserEntity userEntity) {
-        // 参数校验
         if (userEntity == null) {
             return RestResponse.fail("用户信息不能为空");
         }
@@ -71,25 +71,24 @@ public class UserController {
             return RestResponse.fail("密码不能为空");
         }
 
-        // 校验用户名是否已存在
         QueryWrapper<UserEntity> queryWrapper = new QueryWrapper<>();
         queryWrapper.eq("username", userEntity.getUsername().trim());
         if (userService.count(queryWrapper) > 0) {
-            return RestResponse.fail("用户名已存在，无法新增");
+            return RestResponse.fail("用户名已存在");
         }
 
-        // 新增用户
         boolean saveSuccess = userService.save(userEntity);
         if (saveSuccess) {
             return RestResponse.ok(userEntity);
         } else {
-            return RestResponse.fail("新增用户失败");
+            return RestResponse.fail("注册失败");
         }
     }
-    //修改用户
+
+    // 修改
     @PutMapping("/update")
     public RestResponse updateUser(@RequestBody UserEntity userEntity) {
-        if (userEntity.getUid() == null) {
+        if (userEntity.getId() == null) {
             return RestResponse.fail("用户ID不能为空");
         }
         boolean updateSuccess = userService.updateById(userEntity);
@@ -99,12 +98,10 @@ public class UserController {
             return RestResponse.fail("修改失败");
         }
     }
-    //删除用户
+
+    // 删除
     @DeleteMapping("/delete/{id}")
     public RestResponse deleteUser(@PathVariable Integer id) {
-        if (id == null) {
-            return RestResponse.fail("用户ID不能为空");
-        }
         boolean deleteSuccess = userService.removeById(id);
         if (deleteSuccess) {
             return RestResponse.ok("删除成功");
@@ -113,9 +110,3 @@ public class UserController {
         }
     }
 }
-//新增 POST /user/add
-//删除 DELETE /user/delete/1
-//修改 PUT /user/update
-//查询单个 GET /user/getById/1
-//查询所有 GET /user/getAll
-//登录查询 GET /user/getByName

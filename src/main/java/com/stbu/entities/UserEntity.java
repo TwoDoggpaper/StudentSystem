@@ -7,13 +7,12 @@ import com.baomidou.mybatisplus.annotation.TableName;
 import lombok.Data;
 
 @Data
-@TableName("t_user")
+@TableName("sys_user")
 public class UserEntity {
     @TableId(type = IdType.AUTO)
-    private Integer uid;
+    private Integer id;
     private String username;
     private String password;
-    private Integer age;
-    private Integer type;
 
+    private String email;
 }

@@ -34,6 +34,15 @@ public class RestResponse<T> {
         return response;
     }
 
+    // 示例：新增“无数据成功返回”的重载方法（可选）
+    public static <T> RestResponse<T> ok(String msg) {
+        RestResponse<T> response = new RestResponse<>();
+        response.setCode(200);
+        response.setMsg(msg);
+        response.setData(null);
+        return response;
+    }
+
     // getter & setter
     public int getCode() {
         return code;
