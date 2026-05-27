@@ -1,0 +1,17 @@
+server:
+  port: 8080
+spring:
+  datasource:
+    driver-class-name: com.mysql.cj.jdbc.Driver
+    url: jdbc:mysql://localhost:3306/studentsystem
+    username: root
+    password: 1234
+# MyBatis-Plus配置
+mybatis-plus:
+  # 实体类别名扫描包
+  type-aliases-package: com.stbu.entities
+  # 开启驼峰命名转换（数据库t_user的uid对应实体uid，username对应username）
+  configuration:
+    map-underscore-to-camel-case: true
+    # 打印SQL日志（开发环境用，生产关闭）
+    log-impl: org.apache.ibatis.logging.stdout.StdOutImpl
